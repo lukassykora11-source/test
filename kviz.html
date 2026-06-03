@@ -250,9 +250,7 @@
         <button class="opt-btn" onclick="answer(1,this)">Číslo 5</button>
         <button class="opt-btn" onclick="answer(1,this)">Číslo 7</button>
       </div>
-      <div class="feedback" id="fb1">❌ Špatně! Správná odpověď byla <strong>číslo 8</strong>. Nejsi žádný znalec…<br><br>
-        <img src="https://raw.githubusercontent.com/lukassykora11-source/test/main/indulona.png" style="width:100%;border-radius:3px;margin-top:0.75rem;" alt="Indulona">
-      </div>
+      <div class="feedback" id="fb1">❌ Špatně! Správná odpověď byla <strong>číslo 8</strong>. Nejsi žádný znalec…</div>
       <button class="next-btn" id="next1" onclick="goTo(2)">Další otázka →</button>
     </div>
 
@@ -315,6 +313,15 @@
     btn.classList.add('selected');
     document.getElementById('fb' + n).classList.add('show');
     document.getElementById('next' + n).classList.add('show');
+    if (n === 1) {
+      const img = document.querySelector('#q1 .quiz-img');
+      img.style.transition = 'opacity 0.3s';
+      img.style.opacity = '0';
+      setTimeout(() => {
+        img.src = 'https://raw.githubusercontent.com/lukassykora11-source/test/main/indulona.png';
+        img.style.opacity = '1';
+      }, 300);
+    }
   }
 
   function goTo(n) {
