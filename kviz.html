@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odborný test způsobilosti</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0e0c;
+    --card: #1a1916;
+    --border: #2e2c28;
+    --accent: #e8c547;
+    --danger: #e05a4e;
+    --text: #f0ede6;
+    --muted: #7a7670;
+    --font-head: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .header h1 {
+    font-family: var(--font-head);
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .header p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2rem;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .progress-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.75rem;
+  }
+
+  .progress-dot {
+    height: 3px;
+    flex: 1;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.4s;
+  }
+
+  .progress-dot.done { background: var(--accent); }
+  .progress-dot.active { background: var(--accent); opacity: 0.5; }
+
+  .q-num {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .q-text {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+
+  .quiz-img {
+    width: 100%;
+    border-radius: 3px;
+    margin-bottom: 1.5rem;
+    display: block;
+    border: 1px solid var(--border);
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .opt-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 11px 16px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+  }
+
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(232, 197, 71, 0.05);
+  }
+
+  .opt-btn:disabled { opacity: 0.5; cursor: default; }
+  .opt-btn.selected { border-color: var(--danger); background: rgba(224,90,78,0.07); }
+
+  .feedback {
+    margin-top: 1.25rem;
+    padding: 12px 16px;
+    border-left: 3px solid var(--danger);
+    background: rgba(224,90,78,0.07);
+    border-radius: 0 3px 3px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    display: none;
+  }
+
+  .feedback.show { display: block; animation: fadeIn 0.2s ease; }
+
+  .next-btn {
+    margin-top: 1.25rem;
+    background: var(--accent);
+    border: none;
+    border-radius: 3px;
+    padding: 11px 24px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: #0f0e0c;
+    cursor: pointer;
+    display: none;
+    letter-spacing: 0.05em;
+    transition: opacity 0.15s;
+  }
+
+  .next-btn:hover { opacity: 0.85; }
+  .next-btn.show { display: inline-block; animation: fadeIn 0.2s ease 0.1s both; }
+
+  /* Result */
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    animation: fadeIn 0.4s ease;
+    display: none;
+  }
+
+  .result-card.show { display: block; }
+
+  .stamp {
+    display: inline-block;
+    border: 3px solid var(--danger);
+    color: var(--danger);
+    font-family: var(--font-head);
+    font-size: 2.2rem;
+    letter-spacing: 0.1em;
+    padding: 6px 20px;
+    border-radius: 3px;
+    transform: rotate(-3deg);
+    margin-bottom: 1.5rem;
+  }
+
+  .result-title {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+
+  .result-text {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .result-text strong { color: var(--text); }
+
+  .result-accent {
+    display: block;
+    margin-top: 1.5rem;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Test způsobilosti</h1>
+    <p>Speciální edice &mdash; pro Luďka</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="card" id="quiz">
+    <div class="progress-bar">
+      <div class="progress-dot active" id="dot1"></div>
+      <div class="progress-dot" id="dot2"></div>
+      <div class="progress-dot" id="dot3"></div>
+    </div>
+
+    <!-- Q1 -->
+    <div id="q1">
+      <div class="q-num">Otázka 1 / 3</div>
+      <!-- OBRÁZEK 1: změňte URL níže na váš GitHub raw odkaz -->
+      <!-- Příklad: https://raw.githubusercontent.com/VASE-JMENO/REPOZITAR/main/mazat.jpg -->
+      <img class="quiz-img" src="https://raw.githubusercontent.com/VASE-JMENO/REPOZITAR/main/mazat.jpg" alt="Otázka 1" onerror="this.style.display='none'">
+      <div class="q-text">Která žena má největší ňadra?</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(1,this)">Číslo 1</button>
+        <button class="opt-btn" onclick="answer(1,this)">Číslo 3</button>
+        <button class="opt-btn" onclick="answer(1,this)">Číslo 5</button>
+        <button class="opt-btn" onclick="answer(1,this)">Číslo 7</button>
+      </div>
+      <div class="feedback" id="fb1">❌ Špatně! Správná odpověď byla <strong>číslo 8</strong>. Nejsi žádný znalec…</div>
+      <button class="next-btn" id="next1" onclick="goTo(2)">Další otázka →</button>
+    </div>
+
+    <!-- Q2 -->
+    <div id="q2" style="display:none">
+      <div class="q-num">Otázka 2 / 3</div>
+      <!-- OBRÁZEK 2: změňte URL níže na váš GitHub raw odkaz -->
+      <!-- Příklad: https://raw.githubusercontent.com/VASE-JMENO/REPOZITAR/main/indulona.png -->
+      <img class="quiz-img" src="https://raw.githubusercontent.com/VASE-JMENO/REPOZITAR/main/indulona.png" alt="Otázka 2" onerror="this.style.display='none'">
+      <div class="q-text">Co máte odpovědět na depeši v ISKP21 na dotaz:<br><em>„Potvrďte, že jste dostal depeši"</em>?</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(2,this)">ANO</button>
+        <button class="opt-btn" onclick="answer(2,this)">NE</button>
+      </div>
+      <div class="feedback" id="fb2">❌ Špatně! Správně jsou <strong>obě odpovědi</strong> — ANO i NE jsou platné.</div>
+      <button class="next-btn" id="next2" onclick="goTo(3)">Další otázka →</button>
+    </div>
+
+    <!-- Q3 -->
+    <div id="q3" style="display:none">
+      <div class="q-num">Otázka 3 / 3</div>
+      <div class="q-text">Jste muž nebo žena?</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer3('muz',this)">Muž</button>
+        <button class="opt-btn" onclick="answer3('zena',this)">Žena</button>
+      </div>
+      <div class="feedback" id="fb3">❌ Špatně!</div>
+      <button class="next-btn" id="next3" onclick="showResult()">Zobrazit výsledek →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-card" id="result">
+    <div class="stamp">NEVYHOVĚL</div>
+    <div class="result-title">Neprošel jste testem.</div>
+    <div class="result-text">
+      Všechny Vaše finance budou nyní přeposlány na účet<br>
+      <strong>Lukáše Sýkory</strong>,<br>
+      který měl trpělivost — ale všechno má svůj konec.
+      <span class="result-accent">…nebo tak nějak.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  function answer3(volba, btn) {
+    const opts = document.querySelectorAll('#q3 .opt-btn');
+    opts.forEach(b => b.disabled = true);
+    btn.classList.add('selected');
+    const fb = document.getElementById('fb3');
+    if (volba === 'muz') {
+      fb.innerHTML = '🤨 Tomu nevěříme. Jako důkaz pošlete svou fotografii na adresu <strong>macinka@uradvlady.cz</strong> a my zkontrolujeme, jestli tomu tak opravdu je.';
+    } else {
+      fb.innerHTML = '❌ Špatně!';
+    }
+    fb.classList.add('show');
+    document.getElementById('next3').classList.add('show');
+  }
+
+  function answer(n, btn) {
+    const opts = document.querySelectorAll('#q' + n + ' .opt-btn');
+    opts.forEach(b => b.disabled = true);
+    btn.classList.add('selected');
+    document.getElementById('fb' + n).classList.add('show');
+    document.getElementById('next' + n).classList.add('show');
+  }
+
+  function goTo(n) {
+    document.getElementById('q' + (n-1)).style.display = 'none';
+    document.getElementById('q' + n).style.display = 'block';
+    // progress dots
+    document.getElementById('dot' + (n-1)).classList.remove('active');
+    document.getElementById('dot' + (n-1)).classList.add('done');
+    document.getElementById('dot' + n).classList.add('active');
+  }
+
+  function showResult() {
+    document.getElementById('quiz').style.display = 'none';
+    document.getElementById('result').classList.add('show');
+  }
+</script>
+</body>
+</html>
